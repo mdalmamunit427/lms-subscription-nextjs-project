@@ -1,7 +1,7 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface ISubscription extends Document {
-    userId: mongoose.Types.ObjectId;
+    userId: string;
     clerkId: string;
     status: 'pending' | 'completed' | 'failed';
 
@@ -22,8 +22,7 @@ export interface ISubscription extends Document {
 
 const SubscriptionSchema: Schema<ISubscription> = new Schema({
     userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true,
         index: true,
     },

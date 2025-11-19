@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import AnimatedElement from './AnimatedElement';
+import { createCheckoutSession } from '@/actions/subscription';
 
 
 // All-Access Subscription Price
@@ -15,6 +16,44 @@ export default function CTAButton() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const {isSignedIn, isLoaded} = useUser();
+
+  const handleClick = async(e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if(!isLoaded || loading) return;
+
+
+    if(!isSignedIn) {
+      const currentPath = window.location.pathname;
+      router.push(`/sign-in?redirect_url=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const result = await createCheckoutSession();
+
+      if(result.success && result.url) {
+        window.location.href = result.url;
+      } else if (result.error?.includes('already have')) {
+        router.push('/dashboard');
+      }
+      
+      else {
+        alert(result.error || "An error occurred while processing your request. Please try again.");
+        setLoading(false);
+      }
+      
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      alert("An error occurred while processing your request. Please try again.");
+      setLoading(false);
+    }
+  }
+
+
 
   return (
     <AnimatedElement
@@ -24,6 +63,7 @@ export default function CTAButton() {
         <div className="button-group">
           <button
             disabled={loading}
+            onClick={handleClick}
             className="button-primary inline-block"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}

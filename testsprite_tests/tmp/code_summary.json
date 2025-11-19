@@ -1,0 +1,218 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 16",
+    "React 19",
+    "MongoDB",
+    "Clerk",
+    "Svix",
+    "Tailwind CSS"
+  ],
+  "features": [
+    {
+      "name": "User Sign In",
+      "description": "Clerk-based sign-in page that allows users to authenticate. Supports optional redirect_url query parameter. Default redirect is to /dashboard after successful sign-in.",
+      "files": [
+        "src/app/sign-in/[[...sign-in]]/page.tsx"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Sign In API",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/sign-in": {
+            "get": {
+              "summary": "Render sign-in page",
+              "parameters": [
+                {
+                  "name": "redirect_url",
+                  "in": "query",
+                  "schema": {
+                    "type": "string"
+                  },
+                  "required": false,
+                  "description": "Optional redirect URL after successful sign-in"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Sign-in page rendered successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "User Sign Up",
+      "description": "Clerk-based sign-up page that allows new users to create accounts. Supports optional redirect_url query parameter. Default redirect is to / after successful sign-up.",
+      "files": [
+        "src/app/sign-up/[[...sign-up]]/page.tsx"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Sign Up API",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/sign-up": {
+            "get": {
+              "summary": "Render sign-up page",
+              "parameters": [
+                {
+                  "name": "redirect_url",
+                  "in": "query",
+                  "schema": {
+                    "type": "string"
+                  },
+                  "required": false,
+                  "description": "Optional redirect URL after successful sign-up"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Sign-up page rendered successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Clerk Webhook Handler",
+      "description": "Webhook endpoint that receives Clerk events (user.created, user.updated) and syncs user data to MongoDB. Validates svix headers and webhook signatures. Supports test mode for testing without signature verification.",
+      "files": [
+        "src/app/api/webhooks/clerk/route.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Clerk Webhook API",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/api/webhooks/clerk": {
+            "post": {
+              "summary": "Handle Clerk webhook events",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["user.created", "user.updated"]
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "Clerk user ID"
+                            },
+                            "email_addresses": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "email_address": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            },
+                            "first_name": {
+                              "type": "string"
+                            },
+                            "last_name": {
+                              "type": "string"
+                            },
+                            "image_url": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "parameters": [
+                {
+                  "name": "svix-id",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "name": "svix-timestamp",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "name": "svix-signature",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Webhook received and processed successfully"
+                },
+                "400": {
+                  "description": "Missing svix headers or invalid webhook signature"
+                },
+                "500": {
+                  "description": "Missing webhook secret or database sync error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Authentication Middleware",
+      "description": "Clerk middleware that protects routes. Routes matching /dashboard(.*) and /admin(.*) require authentication.",
+      "files": [
+        "src/proxy.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Authentication Middleware",
+          "version": "1.0.0"
+        }
+      }
+    },
+    {
+      "name": "User Model",
+      "description": "MongoDB schema for user data synced from Clerk. Stores clerkId, email, firstName, lastName, and imageUrl with timestamps.",
+      "files": [
+        "src/models/User.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "User Model",
+          "version": "1.0.0"
+        }
+      }
+    }
+  ]
+}

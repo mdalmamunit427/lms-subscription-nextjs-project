@@ -1,5 +1,4 @@
-import { SignIn, SignUp } from '@clerk/nextjs';
-import React from 'react'
+import {  SignUp } from '@clerk/nextjs';
 
 const SignUpPage =  async({searchParams}: {searchParams: {redirect_url?: string}}) => {
     const params = await searchParams;

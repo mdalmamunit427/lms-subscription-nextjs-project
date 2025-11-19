@@ -1,0 +1,17 @@
+[
+  {
+    "id": "TC001",
+    "title": "handle clerk webhook events for user creation and updates",
+    "description": "Test the /api/webhooks/clerk POST endpoint to verify it correctly validates svix headers and webhook signature, processes user.created and user.updated events, and syncs user data to MongoDB without duplication."
+  },
+  {
+    "id": "TC002",
+    "title": "render sign in page with optional redirect url",
+    "description": "Test the /sign-in GET endpoint to ensure the Clerk SignIn component renders correctly with custom styling and supports an optional redirect_url query parameter that redirects users after successful sign-in."
+  },
+  {
+    "id": "TC003",
+    "title": "render sign up page with optional redirect url",
+    "description": "Test the /sign-up GET endpoint to ensure the Clerk SignUp component renders correctly with custom styling and supports an optional redirect_url query parameter that redirects users after successful sign-up."
+  }
+]
